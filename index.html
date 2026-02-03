@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Konya 2026 Ramazan İmsakiyesi (Geri Sayım)</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <style>
+    :root { --card-radius: 18px; }
+    body { background: #0b1220; }
+    .app-wrap { max-width: 980px; margin: 0 auto; }
+    .glass {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(10px);
+      border-radius: var(--card-radius);
+    }
+    .muted { color: rgba(255,255,255,0.72); }
+    .tiny { font-size: 0.9rem; }
+    .timer {
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.5px;
+    }
+    .badge-soft {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.16);
+    }
+    .table thead th {
+      position: sticky;
+      top: 0;
+      background: rgba(11,18,32,0.98);
+      z-index: 2;
+    }
+    .today-row {
+      outline: 2px solid rgba(13,110,253,0.55);
+      outline-offset: -2px;
+      background: rgba(13,110,253,0.10) !important;
+    }
+    .next-target {
+      background: rgba(25, 135, 84, 0.14) !important;
+    }
+    .table td, .table th { color: rgba(255,255,255,0.88); }
+    .table { --bs-table-bg: transparent; --bs-table-striped-bg: rgba(255,255,255,0.04); }
+  </style>
+</head>
+
+<body class="text-light">
+  <div class="container py-4 py-md-5 app-wrap">
+
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-3">
+      <div>
+        <h1 class="h3 mb-1">Konya 2026 Ramazan İmsakiyesi</h1>
+        <div class="muted tiny">
+          Saatler: Europe/Istanbul (Konya). <b>Not:</b> Cihaz saatin doğru olmalı.
+        </div>
+      </div>
+      <div class="d-flex gap-2 align-items-center">
+        <span class="badge badge-soft rounded-pill px-3 py-2">
+          <span class="muted">Şimdi:</span>
+          <span id="nowText" class="ms-1"></span>
+        </span>
+      </div>
+    </div>
+
+    <div class="glass p-3 p-md-4 mb-4">
+      <div class="row g-3 align-items-stretch">
+        <div class="col-12 col-lg-7">
+          <div class="d-flex flex-column h-100">
+            <div class="muted tiny mb-1">Sıradaki hedef</div>
+            <div class="d-flex flex-wrap align-items-end gap-2">
+              <div id="targetLabel" class="h4 mb-0">—</div>
+              <div class="muted">•</div>
+              <div class="muted" id="targetTimeText">—</div>
+            </div>
+
+            <div class="mt-3">
+              <div class="muted tiny mb-1">Geri sayım</div>
+              <div id="countdown" class="display-6 timer mb-0">--:--:--</div>
+              <div class="muted tiny mt-2" id="countdownHint">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-5">
+          <div class="glass p-3 h-100">
+            <div class="muted tiny mb-2">Bugünün saatleri</div>
+            <div id="todayTimes" class="d-grid gap-2">
+              <div class="d-flex justify-content-between"><span class="muted">İmsak (Sahur)</span><strong id="tImsak">—</strong></div>
+              <div class="d-flex justify-content-between"><span class="muted">Akşam (İftar)</span><strong id="tAksam">—</strong></div>
+              <div class="d-flex justify-content-between"><span class="muted">Yatsı</span><strong id="tYatsi">—</strong></div>
+            </div>
+            <hr class="border-light border-opacity-10 my-3">
+            <div class="muted tiny">
+              Mantık: İmsak öncesi sahura, gün içinde iftara, akşamdan sonra yarın sahura geri sayar.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass p-3 p-md-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+        <div>
+          <div class="h5 mb-0">İmsakiye Tablosu</div>
+          <div class="muted tiny">Satırlar: 19 Şubat 2026 – 19 Mart 2026</div>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-light" id="scrollToTodayBtn">Bugüne Git</button>
+        </div>
+      </div>
+
+      <div class="table-responsive" style="max-height: 60vh;">
+        <table class="table table-striped table-hover align-middle mb-0" id="imsakiyeTable">
+          <thead>
+            <tr>
+              <th scope="col">Miladi Tarih</th>
+              <th scope="col" class="text-nowrap">İmsak</th>
+              <th scope="col" class="text-nowrap">Güneş</th>
+              <th scope="col" class="text-nowrap">Öğle</th>
+              <th scope="col" class="text-nowrap">İkindi</th>
+              <th scope="col" class="text-nowrap">Akşam</th>
+              <th scope="col" class="text-nowrap">Yatsı</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="muted tiny mt-3">
+        Not: Cihaz tarihi Ramazan dışındaysa geri sayım için en yakın uygun gün bulunur.
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // === Konya 2026 Ramazan imsakiyesi verisi (PDF'ten) ===
+    // Tarih formatı: YYYY-MM-DD (Miladi)
+    // Saat formatı: HH:MM (24 saat)
+    const imsakiye = [
+      { date: "2026-02-19", imsak:"06:08", gunes:"07:28", ogle:"13:09", ikindi:"16:11", aksam:"18:39", yatsi:"19:55" },
+      { date: "2026-02-20", imsak:"06:06", gunes:"07:27", ogle:"13:09", ikindi:"16:11", aksam:"18:40", yatsi:"19:56" },
+      { date: "2026-02-21", imsak:"06:05", gunes:"07:26", ogle:"13:09", ikindi:"16:12", aksam:"18:41", yatsi:"19:57" },
+      { date: "2026-02-22", imsak:"06:04", gunes:"07:25", ogle:"13:09", ikindi:"16:13", aksam:"18:43", yatsi:"19:58" },
+      { date: "2026-02-23", imsak:"06:03", gunes:"07:23", ogle:"13:08", ikindi:"16:14", aksam:"18:44", yatsi:"19:59" },
+      { date: "2026-02-24", imsak:"06:02", gunes:"07:22", ogle:"13:08", ikindi:"16:14", aksam:"18:45", yatsi:"20:00" },
+      { date: "2026-02-25", imsak:"06:00", gunes:"07:21", ogle:"13:08", ikindi:"16:15", aksam:"18:46", yatsi:"20:01" },
+      { date: "2026-02-26", imsak:"05:59", gunes:"07:19", ogle:"13:08", ikindi:"16:16", aksam:"18:47", yatsi:"20:02" },
+      { date: "2026-02-27", imsak:"05:58", gunes:"07:18", ogle:"13:08", ikindi:"16:16", aksam:"18:48", yatsi:"20:03" },
+      { date: "2026-02-28", imsak:"05:56", gunes:"07:17", ogle:"13:08", ikindi:"16:17", aksam:"18:49", yatsi:"20:04" },
+      { date: "2026-03-01", imsak:"05:55", gunes:"07:15", ogle:"13:07", ikindi:"16:18", aksam:"18:50", yatsi:"20:05" },
+      { date: "2026-03-02", imsak:"05:54", gunes:"07:14", ogle:"13:07", ikindi:"16:18", aksam:"18:51", yatsi:"20:06" },
+      { date: "2026-03-03", imsak:"05:52", gunes:"07:12", ogle:"13:07", ikindi:"16:19", aksam:"18:52", yatsi:"20:07" },
+      { date: "2026-03-04", imsak:"05:51", gunes:"07:11", ogle:"13:07", ikindi:"16:19", aksam:"18:53", yatsi:"20:08" },
+      { date: "2026-03-05", imsak:"05:49", gunes:"07:10", ogle:"13:07", ikindi:"16:20", aksam:"18:54", yatsi:"20:09" },
+      { date: "2026-03-06", imsak:"05:48", gunes:"07:08", ogle:"13:06", ikindi:"16:21", aksam:"18:55", yatsi:"20:10" },
+      { date: "2026-03-07", imsak:"05:46", gunes:"07:07", ogle:"13:06", ikindi:"16:21", aksam:"18:56", yatsi:"20:11" },
+      { date: "2026-03-08", imsak:"05:45", gunes:"07:05", ogle:"13:06", ikindi:"16:22", aksam:"18:57", yatsi:"20:12" },
+      { date: "2026-03-09", imsak:"05:44", gunes:"07:04", ogle:"13:06", ikindi:"16:22", aksam:"18:58", yatsi:"20:13" },
+      { date: "2026-03-10", imsak:"05:42", gunes:"07:02", ogle:"13:05", ikindi:"16:23", aksam:"18:59", yatsi:"20:14" },
+      { date: "2026-03-11", imsak:"05:40", gunes:"07:01", ogle:"13:05", ikindi:"16:23", aksam:"19:00", yatsi:"20:15" },
+      { date: "2026-03-12", imsak:"05:39", gunes:"06:59", ogle:"13:05", ikindi:"16:24", aksam:"19:01", yatsi:"20:16" },
+      { date: "2026-03-13", imsak:"05:37", gunes:"06:58", ogle:"13:05", ikindi:"16:24", aksam:"19:02", yatsi:"20:17" },
+      { date: "2026-03-14", imsak:"05:36", gunes:"06:56", ogle:"13:04", ikindi:"16:25", aksam:"19:02", yatsi:"20:18" },
+      { date: "2026-03-15", imsak:"05:34", gunes:"06:55", ogle:"13:04", ikindi:"16:25", aksam:"19:03", yatsi:"20:19" },
+      { date: "2026-03-16", imsak:"05:33", gunes:"06:53", ogle:"13:04", ikindi:"16:26", aksam:"19:04", yatsi:"20:20" },
+      { date: "2026-03-17", imsak:"05:31", gunes:"06:52", ogle:"13:04", ikindi:"16:26", aksam:"19:05", yatsi:"20:21" },
+      { date: "2026-03-18", imsak:"05:30", gunes:"06:50", ogle:"13:03", ikindi:"16:27", aksam:"19:06", yatsi:"20:22" },
+      { date: "2026-03-19", imsak:"05:28", gunes:"06:49", ogle:"13:03", ikindi:"16:27", aksam:"19:07", yatsi:"20:23" }
+    ];
+
+    // Turkey uses UTC+03:00 (no DST). We'll normalize to a fixed offset.
+    const TZ_OFFSET = "+03:00";
+    const TZ_NAME = "Europe/Istanbul";
+
+    const $ = (id) => document.getElementById(id);
+
+    function pad2(n){ return String(n).padStart(2,"0"); }
+
+    // Get "now" in Europe/Istanbul as parts, then build a Date that represents that wall-clock time in +03:00.
+    function nowInIstanbul() {
+      const dtf = new Intl.DateTimeFormat("en-CA", {
+        timeZone: TZ_NAME,
+        year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", second: "2-digit",
+        hourCycle: "h23"
+      });
+      const parts = dtf.formatToParts(new Date());
+      const get = (type) => parts.find(p => p.type === type)?.value;
+      const y = get("year"), m = get("month"), d = get("day");
+      const hh = get("hour"), mm = get("minute"), ss = get("second");
+      const iso = `${y}-${m}-${d}T${hh}:${mm}:${ss}${TZ_OFFSET}`;
+      return new Date(iso);
+    }
+
+    function fmtNowText(dateObj) {
+      // show like: 2026-02-19 05:12:33
+      const y = dateObj.getFullYear();
+      const m = pad2(dateObj.getMonth()+1);
+      const d = pad2(dateObj.getDate());
+      const hh = pad2(dateObj.getHours());
+      const mm = pad2(dateObj.getMinutes());
+      const ss = pad2(dateObj.getSeconds());
+      return `${y}-${m}-${d} ${hh}:${mm}:${ss}`;
+    }
+
+    function dateKey(dateObj) {
+      return `${dateObj.getFullYear()}-${pad2(dateObj.getMonth()+1)}-${pad2(dateObj.getDate())}`;
+    }
+
+    function buildDateTime(dateStr, timeStr) {
+      // dateStr: YYYY-MM-DD, timeStr: HH:MM -> Date in +03:00
+      return new Date(`${dateStr}T${timeStr}:00${TZ_OFFSET}`);
+    }
+
+    function formatCountdown(ms) {
+      const total = Math.max(0, Math.floor(ms/1000));
+      const h = Math.floor(total / 3600);
+      const m = Math.floor((total % 3600) / 60);
+      const s = total % 60;
+      return `${pad2(h)}:${pad2(m)}:${pad2(s)}`;
+    }
+
+    function renderTable() {
+      const tbody = $("tableBody");
+      tbody.innerHTML = "";
+
+      for (const row of imsakiye) {
+        const tr = document.createElement("tr");
+        tr.dataset.date = row.date;
+        tr.innerHTML = `
+          <td class="text-nowrap">${row.date}</td>
+          <td>${row.imsak}</td>
+          <td>${row.gunes}</td>
+          <td>${row.ogle}</td>
+          <td>${row.ikindi}</td>
+          <td>${row.aksam}</td>
+          <td>${row.yatsi}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function findClosestIndex(targetDateStr) {
+      // If not exactly in dataset, choose the nearest future date; otherwise the last available.
+      const idx = imsakiye.findIndex(r => r.date === targetDateStr);
+      if (idx !== -1) return idx;
+
+      const t = new Date(`${targetDateStr}T00:00:00${TZ_OFFSET}`).getTime();
+      for (let i=0;i<imsakiye.length;i++){
+        const d = new Date(`${imsakiye[i].date}T00:00:00${TZ_OFFSET}`).getTime();
+        if (d >= t) return i;
+      }
+      return imsakiye.length - 1;
+    }
+
+    function updateUI() {
+      const now = nowInIstanbul();
+      $("nowText").textContent = fmtNowText(now);
+
+      const todayKey = dateKey(now);
+      const todayIdx = findClosestIndex(todayKey);
+      const today = imsakiye[todayIdx];
+
+      // Clear row classes
+      document.querySelectorAll("#imsakiyeTable tbody tr").forEach(tr => {
+        tr.classList.remove("today-row", "next-target");
+      });
+
+      // Mark today's row if exact match exists in dataset
+      const exactRow = document.querySelector(`#imsakiyeTable tbody tr[data-date="${todayKey}"]`);
+      if (exactRow) exactRow.classList.add("today-row");
+
+      // Fill today's times (closest day if out of range)
+      $("tImsak").textContent = today.imsak;
+      $("tAksam").textContent = today.aksam;
+      $("tYatsi").textContent = today.yatsi;
+
+      // Decide target: imsak (sahur) vs aksam (iftar) vs next day's imsak
+      const imsakDT = buildDateTime(today.date, today.imsak);
+      const aksamDT = buildDateTime(today.date, today.aksam);
+
+      let targetDT, label, hint, highlightDate;
+
+      if (now < imsakDT) {
+        targetDT = imsakDT;
+        label = "Sahura (İmsak)";
+        hint = "İmsak vakti yaklaşınca sahur biter.";
+        highlightDate = today.date;
+      } else if (now >= imsakDT && now < aksamDT) {
+        targetDT = aksamDT;
+        label = "İftara (Akşam)";
+        hint = "Akşam vakti gelince iftar zamanı.";
+        highlightDate = today.date;
+      } else {
+        // after aksam: count down to next day imsak (if exists)
+        const next = imsakiye[Math.min(todayIdx + 1, imsakiye.length - 1)];
+        targetDT = buildDateTime(next.date, next.imsak);
+        label = "Yarın Sahura (İmsak)";
+        hint = "Bugün akşam geçti; sıradaki hedef yarın imsak.";
+        highlightDate = next.date;
+      }
+
+      $("targetLabel").textContent = label;
+      $("targetTimeText").textContent = `${highlightDate} • ${pad2(targetDT.getHours())}:${pad2(targetDT.getMinutes())}`;
+      $("countdownHint").textContent = hint;
+
+      const remaining = targetDT.getTime() - now.getTime();
+      $("countdown").textContent = formatCountdown(remaining);
+
+      // Highlight the row that contains the next target date
+      const targetRow = document.querySelector(`#imsakiyeTable tbody tr[data-date="${highlightDate}"]`);
+      if (targetRow) targetRow.classList.add("next-target");
+    }
+
+    function scrollToToday() {
+      const now = nowInIstanbul();
+      const todayKey = dateKey(now);
+      const row = document.querySelector(`#imsakiyeTable tbody tr[data-date="${todayKey}"]`)
+              || document.querySelector(`#imsakiyeTable tbody tr.next-target`);
+      if (!row) return;
+      row.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    // Init
+    renderTable();
+    updateUI();
+    setInterval(updateUI, 1000);
+
+    $("scrollToTodayBtn").addEventListener("click", scrollToToday);
+  </script>
+</body>
+</html>
