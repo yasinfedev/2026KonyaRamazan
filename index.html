@@ -54,7 +54,11 @@
       <div>
         <h1 class="h3 mb-1">Konya 2026 Ramazan İmsakiyesi</h1>
         <div class="muted tiny">
-          Saatler: Europe/Istanbul (Konya). <b>Not:</b> Cihaz saatin doğru olmalı.
+          <b>Saatler:</b> Europe/Istanbul (Konya). <b>Not:</b> Cihaz saatin doğru olmalı.<br>
+          <b>Uyarı:</b> Uygulamayı 18 Şubat 2026 itibari ile kullanınız.
+        </div>
+        <div class="muted tiny">
+          <b>Tasarım ve kodlama:</b> Uzm.Dr.Yasin YILDIZ.
         </div>
       </div>
       <div class="d-flex gap-2 align-items-center">
@@ -287,20 +291,20 @@
 
       if (now < imsakDT) {
         targetDT = imsakDT;
-        label = "Sahura (İmsak)";
-        hint = "İmsak vakti yaklaşınca sahur biter.";
+        label = "Sahur (İmsak)";
+        hint = "İmsak vakti gelince sahur vaktidir.";
         highlightDate = today.date;
       } else if (now >= imsakDT && now < aksamDT) {
         targetDT = aksamDT;
-        label = "İftara (Akşam)";
-        hint = "Akşam vakti gelince iftar zamanı.";
+        label = "İftar (Akşam)";
+        hint = "Akşam vakti gelince şimdi iftar zamanıdır.";
         highlightDate = today.date;
       } else {
         // after aksam: count down to next day imsak (if exists)
         const next = imsakiye[Math.min(todayIdx + 1, imsakiye.length - 1)];
         targetDT = buildDateTime(next.date, next.imsak);
-        label = "Yarın Sahura (İmsak)";
-        hint = "Bugün akşam geçti; sıradaki hedef yarın imsak.";
+        label = "Yarınki Sahur (İmsak)";
+        hint = "Bugün iftar oldu; sıradaki hedef yarınki sahur (imsak).";
         highlightDate = next.date;
       }
 
